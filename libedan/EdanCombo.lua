@@ -14,7 +14,7 @@ function EdanCombo.WaitUntil(func)
 end
 
 function EdanCombo.WaitUntilNotDoing(pattern)
-	EdanCombo.Wait(300)
+	EdanCombo.Wait(200)
 	while true do
 		local player = GetSelfPlayer()
 		if string.match(player.CurrentActionName, pattern) == nil then
@@ -24,24 +24,48 @@ function EdanCombo.WaitUntilNotDoing(pattern)
 	end
 end
 
+function EdanCombo.WaitUntilDone()
+	EdanCombo.Wait(200)
+	while true do
+		local player = GetSelfPlayer()
+		if EdanCombo.NotUsingSkill(player.CurrentActionName) then
+			break
+		end
+		coroutine.yield()
+	end
+end
+
 function EdanCombo.UseSkillAtPosition(id, position, delay)
-	EdanSkills.UseSkillAtPosition(id, position, delay)
-	EdanCombo.Wait(delay)
+	EdanSkills.UseSkillAtPosition(id, position, delay or 100)
+	EdanCombo.Wait(delay or 100)
 end
 
 function EdanCombo.UseSkill(id, delay)
-	EdanSkills.UseSkill(id, delay)
-	EdanCombo.Wait(delay)
+	EdanSkills.UseSkill(id, delay or 100)
+	EdanCombo.Wait(delay or 100)
 end
 
 function EdanCombo.DoActionAtPosition(action, position, delay)
-	GetSelfPlayer():DoActionAtPosition(action, position, delay)
-	EdanCombo.Wait(delay)
+	GetSelfPlayer():DoActionAtPosition(action, position, delay or 100)
+	EdanCombo.Wait(delay or 100)
 end
 
 function EdanCombo.DoAction(action, delay)
+	if delay == nil then
+		delay = 100
+	end
 	GetSelfPlayer():DoAction(action, delay)
 	EdanCombo.Wait(delay)
+end
+
+function EdanCombo.SetActionState(keys, delay)
+	GetSelfPlayer():SetActionState(keys, delay or 100)
+	EdanCombo.Wait(delay or 100)
+end
+
+function EdanCombo.SetActionStateAtPosition(keys, position, delay)
+	GetSelfPlayer():SetActionStateAtPosition(keys, position, delay or 100)
+	EdanCombo.Wait(delay or 100)
 end
 
 function EdanCombo.HoldUntilDone(keys, position)
@@ -62,7 +86,7 @@ function EdanCombo.HoldUntilDone(keys, position)
 		end
 
 		if position then
-			player:SetActionStateAtPosition(keys, position, 200)
+			player:SetActionStateAtPosition(keys, player.Position, 200)
 		else
 			player:SetActionState(keys, 200)
 		end
@@ -73,17 +97,8 @@ end
 
 function EdanCombo.PressAndWait(keys, position, duration)
 	local player = GetSelfPlayer()
-	player:SetActionStateAtPosition(keys, position, duration or 200)
-	EdanCombo.Wait(duration or 200)
-
-	while true do
-		player = GetSelfPlayer()
-		local action = player.CurrentActionName
-		if EdanCombo.NotUsingSkill(action) then
-			break
-		end
-		coroutine.yield()
-	end
+	player:SetActionStateAtPosition(keys, position or player.CrosshairPosition, duration or 100)
+	EdanCombo.WaitUntilDone()
 end
 
 EdanCombo.WaitActions = {

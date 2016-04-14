@@ -5,6 +5,7 @@ EdanSkills.LearnedSkillCache = {}
 EdanSkills.LastUpdate = {}
 EdanSkills.SkillLevels = {}
 
+-- returns the skill id you have learned or 0
 function EdanSkills.GetSkill(id)
 	local now = os.clock()
 	local cache = EdanSkills.LearnedSkillCache[id]
@@ -25,6 +26,12 @@ function EdanSkills.GetSkill(id)
 	EdanSkills.LastUpdate[id] = now
 
 	return output
+end
+
+-- get the skill level of the skill you have learned. returns 0 if not learned
+function EdanSkills.GetSkillLevel(id)
+	local learned = EdanSkills.GetSkill(id)
+	return EdanSkills.IdLevels[learned] or 0
 end
 
 function EdanSkills.SkillUsable(id)
